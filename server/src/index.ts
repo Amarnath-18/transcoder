@@ -1,17 +1,26 @@
-import express from "express";
+import { app } from "./app";
+import swaggerUi from "swagger-ui-express";
+import { swaggerSpec } from "./swagger";
+import { env } from "./configs/envs";
 
-const app = express();
+app.use(
+  "/api-docs",
+  swaggerUi.serve,
+  swaggerUi.setup(swaggerSpec, {
+    swaggerOptions: {
+      requestInterceptor: (req: { headers: { Authorization: string; }; }) => {
+        if (req.headers.Authorization) {
+          // If user entered only token, add Bearer
+          if (!req.headers.Authorization.startsWith("Bearer ")) {
+            req.headers.Authorization = `Bearer ${req.headers.Authorization}`;
+          }
+        }
+        return req;
+      },
+    },
+  })
+);
 
-app.use(express.json());
-
-app.get("/health", (_, res) => {
-  res.status(200).json({
-
-    uptime: process.uptime(),
-    message: "OK",
-    timestamp: new Date().toISOString(),
-    environment: process.env.NODE_ENV,
-  });
+app.listen(env.port, "0.0.0.0", () => {
+  console.log(`Server is running on http://localhost:${env.port}`);
 });
-
-export { app };

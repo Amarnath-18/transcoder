@@ -1,7 +1,6 @@
 import path from "path";
 import swaggerJsdoc from "swagger-jsdoc";
-
-const port = Number(process.env.PORT) || 3000;
+import { env } from "./configs/envs";
 
 const options = {
   definition: {
@@ -13,7 +12,7 @@ const options = {
     },
     servers: [
       {
-        url: `http://localhost:${port}`,
+        url: `http://localhost:${env.port}`,
       },
     ],
     
